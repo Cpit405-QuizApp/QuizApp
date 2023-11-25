@@ -1,22 +1,25 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState,useContext } from "react";
+import { Link, useNavigate} from "react-router-dom";
 import axios from "axios";
+import { UserContext } from "../UserContextProvider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   async function login(ev) {
     ev.preventDefault();
     try {
-      await axios.post("/login", { email, password });
-      alert("Login successful");
-      navigate("/index"); 
+      const { data } = await axios.post("/login", { email, password });
+    
+      setUser(data); 
+       alert("Login successful");
+      navigate("/home"); 
     } catch (e) {
-      const errorMessage =
-        e.response?.data?.message || "An unknown error occurred";
-      alert("Login Failed: " + errorMessage);
+     
+      alert("Login Failed: " + e);
     }
   }
 
