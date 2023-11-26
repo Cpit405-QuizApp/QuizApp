@@ -1,15 +1,29 @@
-import React, { useState } from "react";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 
-export default function MyQuizzes() {
+const MyQuizzes = () => {
+  const [quizzes, setQuizzes] = useState([]);
   const [showCreateQuizForm, setShowCreateQuizForm] = useState(false);
   const [quizTitle, setQuizTitle] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [category, setCategory] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [timer, setTimer] = useState(30); // Default to 30 seconds
+  const [timer, setTimer] = useState(30);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserQuizzes = async () => {
+      try {
+        const response = await axios.get("/quizzes/myquizzes");
+        setQuizzes(response.data);
+      } catch (error) {
+        console.error("Error fetching user's quizzes:", error);
+      }
+    };
+
+    fetchUserQuizzes();
+  }, [showCreateQuizForm]);
 
   const handleCreateQuizClick = () => {
     setShowCreateQuizForm(true);
@@ -31,6 +45,7 @@ export default function MyQuizzes() {
     }
     setQuestions(newQuestions);
   };
+
   const handleDeleteQuestion = (index) => {
     const newQuestions = questions.filter((_, i) => i !== index);
     setQuestions(newQuestions);
@@ -46,27 +61,33 @@ export default function MyQuizzes() {
         questions: questions,
         timer: timer
       }, { withCredentials: true }); 
-      console.log(response.data);
-  
-      navigate('/myquizzes'); 
+
+      // Refresh the list of quizzes after creating a new one
+      const updatedQuizzes = await axios.get("/quizzes/myquizzes");
+      setQuizzes(updatedQuizzes.data);
+
+      // Hide the quiz creation form
+      setShowCreateQuizForm(false);
     } catch (error) {
       console.error('There was an error creating the quiz:', error);
     }
   };
 
+  const handleBackClick = () => {
+    setShowCreateQuizForm(false);
+  };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
       <button
-        onClick={handleCreateQuizClick}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={showCreateQuizForm ? handleBackClick : handleCreateQuizClick}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
       >
-        Create Quiz
+        {showCreateQuizForm ? "Back" : "Create Quiz"}
       </button>
 
-      {showCreateQuizForm && (
-        
-        <form onSubmit={handleSubmit} className="w-full max-w-lg mt-6">
+      {showCreateQuizForm ? (
+        <form onSubmit={handleSubmit} className="w-full max-w-lg">
           <div className="mb-4">
             <input
               type="text"
@@ -114,11 +135,9 @@ export default function MyQuizzes() {
                 Entertainment: Board Games
               </option>
               <option value="Science & Nature">Science & Nature</option>
-
               <option value="Information Technology">
                 Information Technology
               </option>
-
               <option value="Science: Computers">Science: Computers</option>
               <option value="Science: Mathematics">Science: Mathematics</option>
               <option value="Mythology">Mythology</option>
@@ -164,7 +183,7 @@ export default function MyQuizzes() {
                   className="w-full p-2 rounded-md border mb-2"
                 />
               ))}
-               <button
+              <button
                 type="button"
                 onClick={() => handleDeleteQuestion(index)}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2"
@@ -205,7 +224,20 @@ export default function MyQuizzes() {
             </button>
           </div>
         </form>
+      ) : (
+        <div className="w-full max-w-lg">
+          <h2 className="text-2xl font-bold mb-4">My Quizzes</h2>
+          <ul>
+            {quizzes.map((quiz) => (
+              <li key={quiz._id} className="mb-2">
+                {quiz.title}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
-}
+};
+
+export default MyQuizzes;
