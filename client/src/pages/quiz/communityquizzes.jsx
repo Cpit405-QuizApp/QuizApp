@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
 const CommunityQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
 
   useEffect(() => {
-
     const fetchQuizzes = async () => {
       try {
         const response = await axios.get("/quizzes/community");
-        setQuizzes(response.data); 
+        setQuizzes(response.data);
       } catch (error) {
         console.error("Error fetching community quizzes:", error);
       }
@@ -37,6 +37,12 @@ const CommunityQuizzes = () => {
             <div>
               <span className="font-bold">Time:</span> {quiz.timer} seconds
             </div>
+            {/* Link to the quiz taker page with the quiz ID */}
+            <Link to={`/quiztaker/${quiz._id}`}>
+              <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">
+                Take Quiz
+              </button>
+            </Link>
           </li>
         ))}
       </ul>
