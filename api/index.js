@@ -149,3 +149,21 @@ app.post('/quizzes', authenticate, async (req, res) => {
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
 });
+
+app.get("/quizzes/myquizzes", authenticate, async (req, res) => {
+  try {
+    const userQuizzes = await Quiz.find({ userId: req.userId });
+    res.json(userQuizzes);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/quizzes/community", async (req, res) => {
+  try {
+    const communityQuizzes = await Quiz.find({}); // Fetch all quizzes without filtering by userId
+    res.json(communityQuizzes);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
