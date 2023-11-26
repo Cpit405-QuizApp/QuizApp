@@ -10,9 +10,10 @@ const CookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "JHjksG678gJKslj7gslJISP8hulSLIjl8j9";
 app.use(CookieParser());
-
+const Quiz = require('./models/quizSchema');
 app.use(express.json());
 app.use(CookieParser());
+const authenticate = require('./middleware/authenticate'); 
 
 app.use(
   cors({
@@ -131,7 +132,20 @@ app.get("/profile", (req, res) => {
   }
 });
 
+app.post('/quizzes', authenticate, async (req, res) => {
+  try {
+    const quizData = {
+      ...req.body,
+      userId: req.userId 
+    };
 
+    const newQuiz = new Quiz(quizData);
+    const savedQuiz = await newQuiz.save();
+    res.status(201).json(savedQuiz);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
 });

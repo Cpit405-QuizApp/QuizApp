@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AttemptSchema = require('./attemptSchema');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -33,20 +34,16 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
- 
   password: {
     type: String,
     required: true,
-    minlength: 1  
-  }
-
-  ,
-  isAdmin: {
-    type: Boolean,
-    default: false
-  }
+    minlength: 1
+  },
+  createdQuizzes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Quiz'
+  }],
+  attemptedQuizzes: [AttemptSchema]
 });
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
