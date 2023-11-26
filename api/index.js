@@ -167,3 +167,28 @@ app.get("/quizzes/community", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.get("/quizzes/:id", async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+    res.json(quiz);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+app.post('/quizzes/:quizId/submit', authenticate, async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const { answers, score } = req.body;
+
+    // TODO(Ask Muayad for the quizzes structure): Add your logic to process quiz submissions here
+
+    // Once you've processed the submission, you can send a response
+    res.json({ message: 'Quiz submitted successfully', score });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
