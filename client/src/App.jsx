@@ -10,6 +10,7 @@ import { UserContextProvider } from "./UserContextProvider";
 import CommunityQuizzes from "./pages/quiz/communityquizzes";
 import ApiQuizzes from "./pages/quiz/apiquizzes";
 import MyQuizzes from "./pages/quiz/myquizzes";
+import QuizTaker from './pages/quiz/quiztaker'; 
 axios.defaults.baseURL="http://localhost:4000"
 axios.defaults.withCredentials=true
 function App() {
@@ -22,8 +23,7 @@ function App() {
         <Route path="/myquizzes"element={<MyQuizzes/>} /> 
         <Route path="/communityquizzes" element={<CommunityQuizzes />} /> 
         <Route path="/apiquizzes" element={<ApiQuizzes />} /> 
-
-      </Route>
+        <Route path="/quiztaker/:quizId" element={<QuizTaker/>} />      </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route index element={<IndexPage />} />
