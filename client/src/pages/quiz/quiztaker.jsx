@@ -10,6 +10,8 @@ const TakeQuiz = () => {
   const [shuffledOptions, setShuffledOptions] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [correctAnswers, setCorrectAnswers] = useState([]);
+  const [incorrectAnswers, setIncorrectAnswers] = useState([]);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -69,12 +71,25 @@ const TakeQuiz = () => {
   };
 
   const calculateScore = () => {
-    const correctAnswers = quiz.questions.filter(
-      (question, index) => answers[index] === question.correctAnswer
-    );
-    const userScore = correctAnswers.length;
+    const correct = [];
+    const incorrect = [];
+
+    quiz.questions.forEach((question, index) => {
+      const userAnswer = answers[index];
+      if (userAnswer === question.correctAnswer) {
+        correct.push(index);
+      } else {
+        incorrect.push(index);
+      }
+    });
+
+    setCorrectAnswers(correct);
+    setIncorrectAnswers(incorrect);
+
+    const userScore = correct.length;
     setScore(userScore);
   };
+
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -130,9 +145,17 @@ const TakeQuiz = () => {
                   name={`question-${index}`}
                   value={option}
                   onChange={() => handleAnswerChange(index, option)}
-                  disabled={isSubmitted} // Disable radio buttons after submission
+                  disabled={isSubmitted}
                 />
-                <label htmlFor={`option-${optionIndex}`}>{option}</label>
+                <label
+                  htmlFor={`option-${optionIndex}`}
+                  className={`
+        ${isSubmitted && option === quiz.questions[index].correctAnswer ? "text-green-500" : ""}
+        ${isSubmitted && option !== quiz.questions[index].correctAnswer ? "text-red-500" : ""}
+      `}
+                >
+                  {option}
+                </label>
               </div>
             ))}
           </div>
