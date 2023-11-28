@@ -13,6 +13,7 @@ app.use(CookieParser());
 const Quiz = require('./models/quizSchema');
 app.use(express.json());
 app.use(CookieParser());
+const Attempt = require("./models/attemptSchema"); 
 const authenticate = require('./middleware/authenticate'); 
 
 app.use(
@@ -179,17 +180,24 @@ app.get("/quizzes/:id", async (req, res) => {
 app.post('/quizzes/:quizId/submit', authenticate, async (req, res) => {
   try {
     const { quizId } = req.params;
-    const { answers, score } = req.body;
+    const userId = req.userId; // Assuming user ID is stored in req.user
+    const { score } = req.body;
 
-    // TODO(Ask Muayad for the quizzes structure): Add your logic to process quiz submissions here
+    const newAttempt = new Attempt({
+      quiz: quizId,
+      user: userId,
+      score: score
+    });
+    await newAttempt.save();
 
-    // Once you've processed the submission, you can send a response
     res.json({ message: 'Quiz submitted successfully', score });
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error details:", error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
-}
-);
+});
+
+
 app.put('/quizzes/:quizId', async (req, res) => {
   const { quizId } = req.params;
   const updatedData = req.body;
