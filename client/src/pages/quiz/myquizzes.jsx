@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import QuizForm from './QuizForm'; 
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -11,6 +12,8 @@ const MyQuizzes = () => {
   const [questions, setQuestions] = useState([]);
   const [timer, setTimer] = useState(30);
   const navigate = useNavigate();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentQuizId, setCurrentQuizId] = useState(null);
 
   useEffect(() => {
     const fetchUserQuizzes = async () => {
@@ -27,6 +30,16 @@ const MyQuizzes = () => {
 
   const handleCreateQuizClick = () => {
     setShowCreateQuizForm(true);
+    setIsEditMode(false);
+    resetForm();
+  };
+  const resetForm = () => {
+    setCurrentQuizId(null);
+    setQuizTitle("");
+    setDifficulty("");
+    setCategory("");
+    setQuestions([]);
+    setTimer(30);
   };
 
   const handleAddQuestion = () => {
@@ -53,191 +66,122 @@ const MyQuizzes = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/quizzes', {
-        title: quizTitle,
-        difficulty: difficulty,
-        category: category,
-        questions: questions,
-        timer: timer
-      }, { withCredentials: true }); 
+    const quizData = {
+      title: quizTitle,
+      difficulty: difficulty,
+      category: category,
+      questions: questions,
+      timer: timer
+    };
 
-      // Refresh the list of quizzes after creating a new one
+    try {
+      if (isEditMode) {
+        await axios.put(`/quizzes/${currentQuizId}`, quizData);
+      } else {
+        await axios.post('/quizzes', quizData);
+      }
+
       const updatedQuizzes = await axios.get("/quizzes/myquizzes");
       setQuizzes(updatedQuizzes.data);
-
-      // Hide the quiz creation form
       setShowCreateQuizForm(false);
+      setIsEditMode(false);
+      resetForm();
     } catch (error) {
-      console.error('There was an error creating the quiz:', error);
+      console.error('Error submitting quiz:', error);
     }
   };
 
   const handleBackClick = () => {
     setShowCreateQuizForm(false);
   };
+  const handleEditQuiz = (quiz) => {
+    setIsEditMode(true);
+    setCurrentQuizId(quiz._id);
+    setQuizTitle(quiz.title);
+    setDifficulty(quiz.difficulty);
+    setCategory(quiz.category);
+    setQuestions(quiz.questions);
+    setTimer(quiz.timer);
+    setShowCreateQuizForm(true);
+  };
+
+  const handleDeleteQuiz = async (quizId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this quiz?");
+    if (isConfirmed) {
+      try {
+        await axios.delete(`/quizzes/${quizId}`);
+        setQuizzes(quizzes.filter(quiz => quiz._id !== quizId));
+      } catch (error) {
+        console.error("Error deleting quiz:", error);
+      }
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
-      <button
-        onClick={showCreateQuizForm ? handleBackClick : handleCreateQuizClick}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-      >
-        {showCreateQuizForm ? "Back" : "Create Quiz"}
-      </button>
-
       {showCreateQuizForm ? (
-        <form onSubmit={handleSubmit} className="w-full max-w-lg">
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Quiz Title"
-              value={quizTitle}
-              onChange={(e) => setQuizTitle(e.target.value)}
-              className="w-full p-2 rounded-md border"
-            />
-          </div>
-
-          <div className="mb-4">
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full p-2 rounded-md border"
-            >
-              <option value="">Select Difficulty</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full p-2 rounded-md border"
-            >
-              <option value="">Select Category</option>
-              <option value="General Knowledge">General Knowledge</option>
-              <option value="Entertainment: Books">Entertainment: Books</option>
-              <option value="Entertainment: Film">Entertainment: Film</option>
-              <option value="Entertainment: Music">Entertainment: Music</option>
-              <option value="Entertainment: Musicals & Theatres">
-                Entertainment: Musicals & Theatres
-              </option>
-              <option value="Entertainment: Television">
-                Entertainment: Television
-              </option>
-              <option value="Entertainment: Video Games">
-                Entertainment: Video Games
-              </option>
-              <option value="Entertainment: Board Games">
-                Entertainment: Board Games
-              </option>
-              <option value="Science & Nature">Science & Nature</option>
-              <option value="Information Technology">
-                Information Technology
-              </option>
-              <option value="Science: Computers">Science: Computers</option>
-              <option value="Science: Mathematics">Science: Mathematics</option>
-              <option value="Mythology">Mythology</option>
-              <option value="Sports">Sports</option>
-              <option value="Geography">Geography</option>
-              <option value="History">History</option>
-              <option value="Politics">Politics</option>
-              <option value="Art">Art</option>
-              <option value="Celebrities">Celebrities</option>
-              <option value="Animals">Animals</option>
-            </select>
-          </div>
-
-          {questions.map((question, index) => (
-            <div key={index} className="mb-4">
-              <input
-                type="text"
-                placeholder="Question Text"
-                value={question.questionText}
-                onChange={(e) =>
-                  handleQuestionChange(index, "questionText", e.target.value)
-                }
-                className="w-full p-2 rounded-md border mb-2"
-              />
-              <input
-                type="text"
-                placeholder="Correct Answer"
-                value={question.correctAnswer}
-                onChange={(e) =>
-                  handleQuestionChange(index, "correctAnswer", e.target.value)
-                }
-                className="w-full p-2 rounded-md border mb-2"
-              />
-              {question.incorrectAnswers.map((answer, ansIndex) => (
-                <input
-                  key={ansIndex}
-                  type="text"
-                  placeholder={`Incorrect Answer ${ansIndex + 1}`}
-                  value={answer}
-                  onChange={(e) =>
-                    handleQuestionChange(index, ansIndex, e.target.value)
-                  }
-                  className="w-full p-2 rounded-md border mb-2"
-                />
-              ))}
-              <button
-                type="button"
-                onClick={() => handleDeleteQuestion(index)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded mt-2"
-              >
-                Delete Question
-              </button>
-            </div>
-          ))}
-          <button
-            onClick={handleAddQuestion}
-            type="button"
-            className="mb-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        <div>
+           <QuizForm
+                        quizTitle={quizTitle}
+                        setQuizTitle={setQuizTitle}
+                        difficulty={difficulty}
+                        setDifficulty={setDifficulty}
+                        category={category}
+                        setCategory={setCategory}
+                        questions={questions}
+                        setQuestions={setQuestions}
+                        timer={timer}
+                        setTimer={setTimer}
+                        handleQuestionChange={handleQuestionChange}
+                        handleDeleteQuestion={handleDeleteQuestion}
+                        handleAddQuestion={handleAddQuestion}
+                        handleSubmit={handleSubmit}
+                        isEditMode={isEditMode}
+                    />
+                    <div className="text-center mt-4">
+                        <button
+                            onClick={handleBackClick}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            ) : (
+          <div>
+             <button
+            onClick={handleCreateQuizClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
           >
-            Add Question
+            Create Quiz
           </button>
-
-          <div className="mb-4">
-            <select
-              value={timer}
-              onChange={(e) => setTimer(e.target.value)}
-              className="w-full p-2 rounded-md border"
-            >
-              <option value="30">30 Seconds</option>
-              <option value="60">1 Minute</option>
-              <option value="120">2 Minutes</option>
-              <option value="180">3 Minutes</option>
-              <option value="240">4 Minutes</option>
-              <option value="300">5 Minutes</option>
-            </select>
+            <ul>
+              {quizzes.map((quiz) => (
+                <li key={quiz._id} className="mb-4 p-4 bg-gray-100 rounded shadow">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-medium">{quiz.title}</span>
+                    <div>
+                      <button
+                        onClick={() => handleEditQuiz(quiz)}
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteQuiz(quiz._id)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          <div className="text-center">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-            >
-              Submit Quiz
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="w-full max-w-lg">
-          <h2 className="text-2xl font-bold mb-4">My Quizzes</h2>
-          <ul>
-            {quizzes.map((quiz) => (
-              <li key={quiz._id} className="mb-2">
-                {quiz.title}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
+        )}
+      </div>
+    );
+  };
 
 export default MyQuizzes;
