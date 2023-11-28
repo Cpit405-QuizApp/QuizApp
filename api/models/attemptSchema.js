@@ -10,10 +10,15 @@ const attemptSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Assuming 'User' is the model for users
+    required: true
+  },
   timestamp: {
     type: Date,
     default: Date.now
   }
 });
 
-module.exports = attemptSchema;
+module.exports = mongoose.model('Attempt', attemptSchema);

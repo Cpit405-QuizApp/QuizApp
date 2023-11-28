@@ -88,6 +88,8 @@ const TakeQuiz = () => {
 
     const userScore = correct.length;
     setScore(userScore);
+    return correct.length; 
+
   };
 
 //
@@ -95,12 +97,14 @@ const TakeQuiz = () => {
     e.preventDefault();
 
     if (!isSubmitted && timeRemaining > 0) {
+      const calculatedScore = calculateScore(); 
+      setScore(calculatedScore);
       calculateScore();
 
       try {
         await axios.post(`/quizzes/${quizId}/submit`, {
-          answers,
-          score,
+  
+          score: calculatedScore,
         });
 
         console.log("Submission successful");
@@ -121,7 +125,6 @@ const TakeQuiz = () => {
     <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
       <h2 className="text-3xl font-bold mb-8 text-center">{quiz.title}</h2>
       {isSubmitted ? (
-        // Display the final score if the quiz has been submitted
         <>
           <div className="mb-4"><b>Your Score: {score}</b></div>
         </>
