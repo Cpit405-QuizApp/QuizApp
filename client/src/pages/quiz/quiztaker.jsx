@@ -90,7 +90,7 @@ const TakeQuiz = () => {
     setScore(userScore);
   };
 
-
+//
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
