@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import QuizForm from './QuizForm'; 
+import { Link } from 'react-router-dom';
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -155,11 +156,25 @@ const MyQuizzes = () => {
           >
             Create Quiz
           </button>
-            <ul>
-              {quizzes.map((quiz) => (
-                <li key={quiz._id} className="mb-4 p-4 bg-gray-100 rounded shadow">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">{quiz.title}</span>
+          <ul className="w-full max-w-md">
+            {quizzes.map((quiz) => (
+              <li key={quiz._id} className="bg-white shadow-md p-6 rounded-md mb-4">
+                <div className="font-bold text-lg mb-2">{quiz.title}</div>
+                <div>
+                  <span className="font-bold">Category:</span> {quiz.category}
+                </div>
+                <div>
+                  <span className="font-bold">Difficulty:</span> {quiz.difficulty}
+                </div>
+                <div>
+                  <span className="font-bold">Time:</span> {quiz.timer} seconds
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <Link to={`/quiztaker/${quiz._id}`}>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
+                      Try Quiz
+                    </button>
+                  </Link>
                     <div>
                       <button
                         onClick={() => handleEditQuiz(quiz)}
