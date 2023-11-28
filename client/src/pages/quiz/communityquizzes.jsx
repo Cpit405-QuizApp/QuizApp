@@ -39,7 +39,7 @@ const CommunityQuizzes = () => {
             </div>
             {/* Link to the quiz taker page with the quiz ID */}
             <Link to={`/quiztaker/${quiz._id}`}>
-              <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                 Take Quiz
               </button>
             </Link>
