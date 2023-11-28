@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams  } from "react-router-dom";
 
 const TakeQuiz = () => {
   const { quizId } = useParams();
@@ -43,14 +43,25 @@ const TakeQuiz = () => {
             return prevTime - 1;
           } else {
             clearInterval(interval);
+            if (!isSubmitted) {
+              submitQuiz();
+            }
             return 0;
           }
         });
       }, 1000);
+    } else if (!isSubmitted) {
+      submitQuiz();
     }
 
-    return () => clearInterval(interval);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
   }, [timeRemaining, isSubmitted]);
+
 
   const shuffleArray = (array) => {
     const shuffledArray = array.slice();
@@ -93,36 +104,77 @@ const TakeQuiz = () => {
   };
 
 //
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+const handleFormSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!isSubmitted && timeRemaining > 0) {
-      const calculatedScore = calculateScore(); 
-      setScore(calculatedScore);
-      calculateScore();
+  if (!isSubmitted && timeRemaining > 0) {
+    const calculatedScore = calculateScore(); 
+    setScore(calculatedScore);
+    calculateScore();
 
-      try {
-        await axios.post(`/quizzes/${quizId}/submit`, {
-  
-          score: calculatedScore,
-        });
+    try {
+      await axios.post(`/quizzes/${quizId}/submit`, {
+        answers,
+        score: calculatedScore,
+      });
 
-        console.log("Submission successful");
-        setIsSubmitted(true); // Disable further submissions
-      } catch (error) {
-        console.error("Error submitting answers:", error);
-      }
-    } else {
-      console.log("Already submitted or no remaining time");
+      console.log("Submission successful");
+      setIsSubmitted(true); 
+    } catch (error) {
+      console.error("Error submitting answers:", error);
     }
-  };
+  } else {
+    console.log("Already submitted or no remaining time");
+  }
+};
+
+  
+const submitQuiz = async () => {
+  if (!isSubmitted) {
+    const calculatedScore = calculateScore();
+    setScore(calculatedScore);
+
+    try {
+      await axios.post(`/quizzes/${quizId}/submit`, {
+        answers,
+        score: calculatedScore,
+      });
+
+      console.log("Submission successful");
+      setIsSubmitted(true); 
+    } catch (error) {
+      console.error("Error submitting answers:", error);
+    }
+  }
+};
+
+const handleBeforeUnload = (event) => {
+  if (!isSubmitted) {
+    submitQuiz();
+    event.preventDefault();
+    event.returnValue = "";
+  }
+};
+
+  useEffect(() => {
+    window.onbeforeunload = (e) => {
+      if (!isSubmitted) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, [isSubmitted]);
 
   if (!quiz) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
+    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskerville min-h-screen flex flex-col justify-start items-center py-8">
       <h2 className="text-3xl font-bold mb-8 text-center">{quiz.title}</h2>
       {isSubmitted ? (
         <>
@@ -130,10 +182,9 @@ const TakeQuiz = () => {
         </>
       ) : (
         <>
-          {timeRemaining <= 0 && (
-            <div className="mb-4 text-red-600">Time's up! You cannot submit anymore.</div>
-          )}
-          <div className="mb-4">Time Remaining: {timeRemaining} seconds</div>
+        
+            <div className="mb-4">Time Remaining: {timeRemaining} seconds</div>
+          
         </>
       )}
       <form onSubmit={handleFormSubmit}>
@@ -153,9 +204,9 @@ const TakeQuiz = () => {
                 <label
                   htmlFor={`option-${optionIndex}`}
                   className={`
-        ${isSubmitted && option === quiz.questions[index].correctAnswer ? "text-green-500" : ""}
-        ${isSubmitted && option !== quiz.questions[index].correctAnswer ? "text-red-500" : ""}
-      `}
+            ${isSubmitted && option === quiz.questions[index].correctAnswer ? "text-green-500" : ""}
+            ${isSubmitted && option !== quiz.questions[index].correctAnswer ? "text-red-500" : ""}
+          `}
                 >
                   {option}
                 </label>
@@ -172,7 +223,6 @@ const TakeQuiz = () => {
         </button>
       </form>
     </div>
-  );
-};
-
+ 
+  );}
 export default TakeQuiz;
