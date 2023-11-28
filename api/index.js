@@ -146,9 +146,6 @@ app.post('/quizzes', authenticate, async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-app.listen(4000, () => {
-  console.log("Server is running on port 4000");
-});
 
 app.get("/quizzes/myquizzes", authenticate, async (req, res) => {
   try {
@@ -191,4 +188,32 @@ app.post('/quizzes/:quizId/submit', authenticate, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
+}
+);
+app.put('/quizzes/:quizId', async (req, res) => {
+  const { quizId } = req.params;
+  const updatedData = req.body;
+
+  try {
+    const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updatedData, { new: true });
+    res.status(200).json(updatedQuiz);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating quiz", error });
+  }
+});
+
+app.delete('/quizzes/:quizId', async (req, res) => {
+  const { quizId } = req.params;
+
+  try {
+    await Quiz.findByIdAndDelete(quizId);
+    res.status(200).json({ message: "Quiz successfully deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting quiz", error });
+  }
+});
+
+
+app.listen(4000, () => {
+  console.log("Server is running on port 4000");
 });
