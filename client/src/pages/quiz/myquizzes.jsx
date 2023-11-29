@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import QuizForm from './QuizForm'; 
 import { Link } from 'react-router-dom';
+import QuizAttempts from "./QuizAttempts";
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -15,6 +16,7 @@ const MyQuizzes = () => {
   const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentQuizId, setCurrentQuizId] = useState(null);
+  const [showDetails, setShowDetails] = useState({});
 
   useEffect(() => {
     const fetchUserQuizzes = async () => {
@@ -117,7 +119,13 @@ const MyQuizzes = () => {
       }
     }
   };
-
+  const toggleDetails = (quizId) => {
+    setShowDetails((prevDetails) => ({
+      ...prevDetails,
+      [quizId]: !prevDetails[quizId],
+    }));
+  };
+  
   return (
     <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
       {showCreateQuizForm ? (
@@ -188,8 +196,18 @@ const MyQuizzes = () => {
                       >
                         Delete
                       </button>
+
+                     <button
+                    onClick={() => toggleDetails(quiz._id)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                  >
+                    Details
+                  </button>
                     </div>
                   </div>
+                  {showDetails[quiz._id] && (
+                <QuizAttempts quizId={quiz._id} />
+                )}
                 </li>
               ))}
             </ul>

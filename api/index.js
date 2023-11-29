@@ -279,6 +279,46 @@ app.get('/leaderboard', async (req, res) => {
   }
 });
 
+app.get('/quizzes/:quizId/attempts', async (req, res) => {
+  try {
+    const quizId = req.params.quizId;
+    const attempts = await Attempt.find({ quiz: quizId }).populate('user', 'firstName lastName');
+    if (attempts.length > 0) {
+      res.json(attempts);
+    } else {
+      res.status(404).json({ message: 'No attempts found for this quiz.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+app.get("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+app.get("/attempts", authenticate, async (req, res) => {
+  try {
+    const { quizIds } = req.query;
+    const quizIdArray = quizIds.split(",");
+    const userAttempts = await Attempt.find({
+      quiz: { $in: quizIdArray },
+    }).populate("user", "firstName lastName"); // Populate user details
+    res.json(userAttempts);
+  } catch (error) {
+    console.error("Error fetching user's quiz attempts:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
