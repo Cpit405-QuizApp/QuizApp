@@ -246,6 +246,7 @@ app.get("/attempts", authenticate, async (req, res) => {
   }
 });
 
+
 app.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -261,6 +262,7 @@ app.get("/:userId", async (req, res) => {
   }
 });
 
+
 app.get('/quizzes/:quizId/attempts', async (req, res) => {
   try {
     const quizId = req.params.quizId;
@@ -271,6 +273,53 @@ app.get('/quizzes/:quizId/attempts', async (req, res) => {
       res.status(404).json({ message: 'No attempts found for this quiz.' });
     }
   } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
+
+app.get('/leaderboard', async (req, res) => {
+  try {
+    const leaderboardData = await Attempt.aggregate([
+      {
+        $group: {
+          _id: '$user',
+          totalScore: { $sum: '$score' },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { totalScore: -1, count: -1 },
+      },
+      {
+        $lookup: {
+          from: 'users', 
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 0,
+          user: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+          },
+          totalScore: 1,
+          count: 1,
+        },
+      },
+    ]);
+
+    res.json(leaderboardData);
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 });
