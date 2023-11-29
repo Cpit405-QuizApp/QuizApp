@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QuizForm from './QuizForm'; 
 import QuizAttempts from "./QuizAttempts";
-
+import { Link } from 'react-router-dom';
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
