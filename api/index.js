@@ -159,12 +159,24 @@ app.get("/quizzes/myquizzes", authenticate, async (req, res) => {
 
 app.get("/quizzes/community", async (req, res) => {
   try {
-    const communityQuizzes = await Quiz.find({}); // Fetch all quizzes without filtering by userId
+    const { difficulty, category } = req.query;
+    const filter = {};
+
+    if (difficulty) {
+      filter.difficulty = difficulty;
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    const communityQuizzes = await Quiz.find(filter);
     res.json(communityQuizzes);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 app.get("/quizzes/:id", async (req, res) => {
   try {
@@ -220,6 +232,7 @@ app.delete('/quizzes/:quizId', async (req, res) => {
     res.status(500).json({ message: "Error deleting quiz", error });
   }
 });
+
 
 
 app.listen(4000, () => {
