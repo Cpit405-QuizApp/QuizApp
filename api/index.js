@@ -245,7 +245,7 @@ app.get("/attempts", authenticate, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
+//
 
 app.get("/:userId", async (req, res) => {
   try {
