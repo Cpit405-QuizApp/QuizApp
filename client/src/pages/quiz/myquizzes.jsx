@@ -192,7 +192,7 @@ const MyQuizzes = () => {
                       </button>
                       <button
                         onClick={() => handleDeleteQuiz(quiz._id)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded mr-2"
                       >
                         Delete
                       </button>
