@@ -233,6 +233,51 @@ app.delete('/quizzes/:quizId', async (req, res) => {
   }
 });
 
+app.get('/leaderboard', async (req, res) => {
+  try {
+    const leaderboardData = await Attempt.aggregate([
+      {
+        $group: {
+          _id: '$user',
+          totalScore: { $sum: '$score' },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { totalScore: -1, count: -1 },
+      },
+      {
+        $lookup: {
+          from: 'users', 
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 0,
+          user: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+          },
+          totalScore: 1,
+          count: 1,
+        },
+      },
+    ]);
+
+    res.json(leaderboardData);
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
 
 
 app.listen(4000, () => {
