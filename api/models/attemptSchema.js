@@ -12,7 +12,7 @@ const attemptSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assuming 'User' is the model for users
+    ref: 'User', 
     required: true
   },
   timestamp: {

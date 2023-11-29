@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
 import QuizForm from './QuizForm'; 
+import QuizAttempts from "./QuizAttempts";
+
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -11,15 +12,18 @@ const MyQuizzes = () => {
   const [category, setCategory] = useState("");
   const [questions, setQuestions] = useState([]);
   const [timer, setTimer] = useState(30);
-  const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentQuizId, setCurrentQuizId] = useState(null);
 
-  useEffect(() => {
+  const [showDetails, setShowDetails] = useState({});
+
+useEffect(() => {
     const fetchUserQuizzes = async () => {
       try {
         const response = await axios.get("/quizzes/myquizzes");
         setQuizzes(response.data);
+        const ids = response.data.map(quiz => quiz._id);
+        console.log(ids);
       } catch (error) {
         console.error("Error fetching user's quizzes:", error);
       }
@@ -28,11 +32,13 @@ const MyQuizzes = () => {
     fetchUserQuizzes();
   }, [showCreateQuizForm]);
 
+
   const handleCreateQuizClick = () => {
     setShowCreateQuizForm(true);
     setIsEditMode(false);
     resetForm();
   };
+
   const resetForm = () => {
     setCurrentQuizId(null);
     setQuizTitle("");
@@ -117,10 +123,19 @@ const MyQuizzes = () => {
     }
   };
 
+  const toggleDetails = (quizId) => {
+    setShowDetails((prevDetails) => ({
+      ...prevDetails,
+      [quizId]: !prevDetails[quizId],
+    }));
+  };
+
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col justify-start items-center py-8">
-      {showCreateQuizForm ? (
-        <div>
+    <div className="max-w-screen-xl mx-auto bg-gray-100 rounded-md shadow-md Baskervville min-h-screen flex flex-col items-center py-8">
+    <div className="flex-grow flex flex-row">
+      <div className="flex-grow-1 p-6">
+        {showCreateQuizForm ? (
+          <div>
            <QuizForm
                         quizTitle={quizTitle}
                         setQuizTitle={setQuizTitle}
@@ -146,7 +161,9 @@ const MyQuizzes = () => {
                             Back
                         </button>
                     </div>
+                    
                 </div>
+                
             ) : (
           <div>
              <button
@@ -173,15 +190,28 @@ const MyQuizzes = () => {
                       >
                         Delete
                       </button>
+                      <button
+                    onClick={() => toggleDetails(quiz._id)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2"
+                  >
+                    Details
+                  </button>
                     </div>
                   </div>
+                  {showDetails[quiz._id] && (
+                <QuizAttempts quizId={quiz._id} />
+                )}
                 </li>
               ))}
             </ul>
           </div>
         )}
+         
       </div>
-    );
-  };
+     
+      </div>
+    </div>
+  );
+};
 
 export default MyQuizzes;

@@ -10,11 +10,11 @@ const CookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "JHjksG678gJKslj7gslJISP8hulSLIjl8j9";
 app.use(CookieParser());
-const Quiz = require('./models/quizSchema');
+const Quiz = require("./models/quizSchema");
 app.use(express.json());
 app.use(CookieParser());
-const Attempt = require("./models/attemptSchema"); 
-const authenticate = require('./middleware/authenticate'); 
+const Attempt = require("./models/attemptSchema");
+const authenticate = require("./middleware/authenticate");
 
 app.use(
   cors({
@@ -25,11 +25,14 @@ app.use(
 
 mongoose.connect(process.env.MONGOOSE_URL);
 
-mongoose.connect(process.env.MONGOOSE_URL).then(() => {
-  console.log("Successfully connected to MongoDB Atlas!");
-}).catch(err => {
-  console.error("Error connecting to MongoDB Atlas:", err.message);
-});
+mongoose
+  .connect(process.env.MONGOOSE_URL)
+  .then(() => {
+    console.log("Successfully connected to MongoDB Atlas!");
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB Atlas:", err.message);
+  });
 
 app.get("/test", (req, res) => {
   res.json("test ok");
@@ -70,7 +73,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
@@ -90,8 +92,13 @@ app.post("/login", async (req, res) => {
               console.error(err);
               res.status(500).json({ message: "Internal server error" });
             } else {
-              
-              res.cookie('token', token).json({ success: true, message: "Login successful", token: token });
+              res
+                .cookie("token", token)
+                .json({
+                  success: true,
+                  message: "Login successful",
+                  token: token,
+                });
             }
           }
         );
@@ -116,28 +123,29 @@ app.get("/profile", (req, res) => {
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, decodedToken) => {
       if (err) {
-        res.json(null); 
+        res.json(null);
       } else {
-        const userId = decodedToken.id; 
+        const userId = decodedToken.id;
         try {
-          const { firstName, lastName, email, _id } =
-            await User.findById(userId);
+          const { firstName, lastName, email, _id } = await User.findById(
+            userId
+          );
           res.json({ firstName, lastName, email, _id });
         } catch (error) {
-          res.json(null); 
+          res.json(null);
         }
       }
     });
   } else {
-    res.json(null); 
+    res.json(null);
   }
 });
 
-app.post('/quizzes', authenticate, async (req, res) => {
+app.post("/quizzes", authenticate, async (req, res) => {
   try {
     const quizData = {
       ...req.body,
-      userId: req.userId 
+      userId: req.userId,
     };
 
     const newQuiz = new Quiz(quizData);
@@ -177,7 +185,7 @@ app.get("/quizzes/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-app.post('/quizzes/:quizId/submit', authenticate, async (req, res) => {
+app.post("/quizzes/:quizId/submit", authenticate, async (req, res) => {
   try {
     const { quizId } = req.params;
     const userId = req.userId; // Assuming user ID is stored in req.user
@@ -186,31 +194,34 @@ app.post('/quizzes/:quizId/submit', authenticate, async (req, res) => {
     const newAttempt = new Attempt({
       quiz: quizId,
       user: userId,
-      score: score
+      score: score,
     });
     await newAttempt.save();
 
-    res.json({ message: 'Quiz submitted successfully', score });
+    res.json({ message: "Quiz submitted successfully", score });
   } catch (error) {
     console.error("Error details:", error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
-
-app.put('/quizzes/:quizId', async (req, res) => {
+app.put("/quizzes/:quizId", async (req, res) => {
   const { quizId } = req.params;
   const updatedData = req.body;
 
   try {
-    const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updatedData, { new: true });
+    const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updatedData, {
+      new: true,
+    });
     res.status(200).json(updatedQuiz);
   } catch (error) {
     res.status(500).json({ message: "Error updating quiz", error });
   }
 });
 
-app.delete('/quizzes/:quizId', async (req, res) => {
+app.delete("/quizzes/:quizId", async (req, res) => {
   const { quizId } = req.params;
 
   try {
@@ -221,6 +232,48 @@ app.delete('/quizzes/:quizId', async (req, res) => {
   }
 });
 
+app.get("/attempts", authenticate, async (req, res) => {
+  try {
+    const { quizIds } = req.query;
+    const quizIdArray = quizIds.split(",");
+    const userAttempts = await Attempt.find({
+      quiz: { $in: quizIdArray },
+    }).populate("user", "firstName lastName"); // Populate user details
+    res.json(userAttempts);
+  } catch (error) {
+    console.error("Error fetching user's quiz attempts:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get('/quizzes/:quizId/attempts', async (req, res) => {
+  try {
+    const quizId = req.params.quizId;
+    const attempts = await Attempt.find({ quiz: quizId }).populate('user', 'firstName lastName');
+    if (attempts.length > 0) {
+      res.json(attempts);
+    } else {
+      res.status(404).json({ message: 'No attempts found for this quiz.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
 
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
