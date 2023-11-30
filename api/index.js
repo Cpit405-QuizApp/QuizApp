@@ -150,12 +150,13 @@ app.post('/quizzes', authenticate, async (req, res) => {
 
 app.get("/quizzes/myquizzes", authenticate, async (req, res) => {
   try {
-    const userQuizzes = await Quiz.find({ userId: req.userId });
+    const userQuizzes = await Quiz.find({ userId: req.userId }).sort({ createdAt: -1 });
     res.json(userQuizzes);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 app.get("/quizzes/community", async (req, res) => {
   try {
@@ -170,13 +171,12 @@ app.get("/quizzes/community", async (req, res) => {
       filter.category = category;
     }
 
-    const communityQuizzes = await Quiz.find(filter);
+    const communityQuizzes = await Quiz.find(filter).sort({ createdAt: -1 });
     res.json(communityQuizzes);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 app.get("/quizzes/:id", async (req, res) => {
   try {
