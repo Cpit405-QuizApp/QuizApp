@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import styles from './IndexPage.module.css'; 
 
 export default function RegisterPage() {
   const [firstName, setFirstName] = useState("");
@@ -34,12 +35,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form
         onSubmit={register}
-        className="w-full max-w-md bg-white p-8 rounded-lg  bg-opacity-50 shadow-md"
+        className="w-full max-w-md bg-white p-8 rounded-lg shadow-md border border-black"
       >
-        <h1 className="text-4xl font-bold mb-8 text-center">Sign up</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center text-black">Sign up</h1>
+
 
         {/* First Name */}
         <div className="mb-4">
@@ -173,14 +175,14 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          className={`w-full py-2 px-4 rounded-md ${styles.loginButton}`} // Use loginButton styles for the submit button
         >
           Create account
         </button>
         <div className="flex justify-center mt-2">
-          <span className="primary">
+          <span className="text-black">
             Already a member?{" "}
-            <Link to="/login" className="underline">
+            <Link to="/login" className="underline text-black hover:text-opacity-70">
               Login
             </Link>
           </span>

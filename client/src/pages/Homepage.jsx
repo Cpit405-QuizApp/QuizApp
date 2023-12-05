@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 const HomePage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
@@ -20,13 +19,11 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      {/* Display Welcome Message */}
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-4">Welcome to Quiz App</h2>
         <p className="text-gray-600">Challenge yourself with quizzes and see where you stand on the leaderboard!</p>
       </div>
 
-      {/* Display Leaderboard */}
       <div>
         <h2 className="text-2xl font-bold mb-4">Leaderboard</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import QuizForm from "./QuizForm";
 import { Link } from "react-router-dom";
 import QuizAttempts from "./QuizAttempts";
+import styles from '../IndexPage.module.css'; // Adjust the path if necessary
+
 
 const MyQuizzes = () => {
   const [quizzes, setQuizzes] = useState([]);

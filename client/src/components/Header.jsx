@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Link, NavLink, Navigate } from "react-router-dom";
 import { UserContext } from "../UserContextProvider";
 import axios from "axios"; // Import axios
+import logo from "../assets/img/logo.png";
 
 export default function Header() {
   const { user, ready, setUser } = useContext(UserContext); // Import and use setUser
@@ -27,8 +28,8 @@ export default function Header() {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Link to="/home" className="text-lg font-semibold text-blue-600 hover:text-blue-800">
-                Home
+            <Link to="/home">
+                <img src={logo} alt="Logo" className="h-14 w-14" />
               </Link>
 
               <div>
