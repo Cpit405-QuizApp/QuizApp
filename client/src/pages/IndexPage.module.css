@@ -1,0 +1,32 @@
+/* IndexPage.module.css */
+.loginButton {
+  border-color: #2C2A2D;
+  color: #2C2A2D;
+  background-color: transparent;
+  border: 2px solid #2C2A2D;
+  transition: background-color 300ms, color 300ms;
+}
+
+.loginButton:hover {
+  background-color: #2C2A2D;
+  color: #ffffff;
+}
+
+.signupButton {
+  background-color: #ffffff;
+  color: #2C2A2D;
+  border: 2px solid #2C2A2D;
+  transition: background-color 300ms, color 300ms;
+}
+
+.signupButton:hover {
+  background-color: #2C2A2D;
+  color: #ffffff;
+}
+
+.normalbutton {
+  background-color: #2C2A2D;
+  color: #ffffff;
+  border: 2px solid #F38D1C;
+  transition: background-color 300ms, color 300ms;
+}
