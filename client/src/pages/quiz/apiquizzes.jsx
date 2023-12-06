@@ -10,6 +10,7 @@ export default function ApiQuizzes() {
   const [category, setCategory] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(null);
+  const [uniqueKey, setUniqueKey] = useState(0);
 
 
   const categories = [
@@ -48,6 +49,7 @@ export default function ApiQuizzes() {
       setIsSubmitted(false);
       setUserAnswers({});
       setScore(null);
+      setUniqueKey(prevKey => prevKey + 1)
     } catch (error) {
       console.error("Error fetching quizzes:", error);
     }
@@ -87,9 +89,9 @@ export default function ApiQuizzes() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-start items-center py-8">
-      <h2>API Quizzes</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="max-w-md mx-auto p-6 bg-gray-100 rounded-md shadow-md Baskerville min-h-screen flex flex-col justify-start items-center py-8">
+    <h2 className="text-3xl font-bold mb-8 text-center">API Quizzes</h2>
+    <form onSubmit={handleSubmit} className="mb-8">
         <div className="mb-4">
           <label>Number of Questions:</label>
           <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
@@ -125,7 +127,7 @@ export default function ApiQuizzes() {
             <div className="mb-4">Your Score: {score} / {quizzes.length}</div>
           )}
           {quizzes.map((quiz, index) => (
-            <div key={index} className="mb-4">
+            <div key={`${uniqueKey}-${index}`} className="mb-4">
               <div>{decodeHtml(quiz.question)}</div>
               {quiz.incorrect_answers.concat(quiz.correct_answer).sort().map((answer, answerIndex) => (
                 <div key={answerIndex}>
