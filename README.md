@@ -4,11 +4,11 @@
 
 QuizApp is a web application designed to provide users with an interactive platform for participating in quizzes, creating their quizzes, and exploring a leaderboard. QuizApp offers a user-friendly and feature-rich experience.
   
-### Key Features
+## Key Features
 
-- **Quiz Participation:** Users can participate in a variety of quizzes on different topics.
-- **Quiz Creation:** Users can create their quizzes, customizing questions and answers.
-- **Leaderboard:** Explore the leaderboard to see who the top 5 users on the website are in points (based on community quizzes).
+- **Quiz Participation:** Engage in quizzes covering various topics.
+- **Quiz Creation:** Create personalized quizzes with customizable questions and answers.
+- **Leaderboard:** Explore and view the top users based on community quiz points.
 
 
 ### Problems Solved
@@ -89,11 +89,6 @@ To use the QuizApp, follow these steps:
 
 Enjoy your quiz experience on QuizApp!
 
-## Key Features
-
-- **Quiz Participation:** Engage in quizzes covering various topics.
-- **Quiz Creation:** Create personalized quizzes with customizable questions and answers.
-- **Leaderboard:** Explore and view the top users based on community quiz points.
 
 
 ## API Functionality
