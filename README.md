@@ -3,12 +3,13 @@
 ## Overview
 
 QuizApp is a web application designed to provide users with an interactive platform for participating in quizzes, creating their quizzes, and exploring a leaderboard. QuizApp offers a user-friendly and feature-rich experience.
-
+  
 ### Key Features
 
 - **Quiz Participation:** Users can participate in a variety of quizzes on different topics.
 - **Quiz Creation:** Users can create their quizzes, customizing questions and answers.
 - **Leaderboard:** Explore the leaderboard to see who the top 5 users on the website are in points (based on community quizzes).
+
 
 ### Problems Solved
 
@@ -122,3 +123,25 @@ Ensure to set the following environment variable:
   - Replace `<username>`, `<password>`, `<cluster-url>`, and `<database>` with your actual MongoDB credentials.
 
 This configuration ensures a seamless connection to the MongoDB database for storing user data and quiz information.
+
+## Screenshots
+
+Here are some screenshots to give you a visual overview of QuizApp's user interface and key features.
+
+1. **Index Page:**
+   - ![First Page](screenshots/screenshot1.png)
+
+2. **Login Page:**
+   - ![Login Page](screenshots/screenshot2.png)
+
+3. **Registeration Page:**
+   - ![Registeration Page](screenshots/screenshot3.png)
+    
+4. **Homepage:**
+   - ![Homepage](screenshots/screenshot4.png)
+
+5. **Taking Quiz:**
+   - ![Taking Quiz](screenshots/screenshot6.png)
+
+6. **Quiz Details:**
+   - ![Quiz Details](screenshots/screenshot7.png)
