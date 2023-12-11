@@ -6,7 +6,7 @@ QuizApp is a web application designed to provide users with an interactive platf
   
 ### Video Demo
 
-Check out the [Video Demo](https://youtu.be/IvPsstzbrSs) to see QuizApp in action.
+ [![](screenshots/youtube.png)](https://youtu.be/IvPsstzbrSs) 
 
 ## Key Features
 
